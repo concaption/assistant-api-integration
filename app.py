@@ -2,9 +2,15 @@ import os
 from time import sleep
 from packaging import version
 from flask import Flask, request, jsonify
+from flasgger import Swagger
+from dotenv import load_dotenv
 import openai
 from openai import OpenAI
 import functions
+
+
+# Load environment variables
+load_dotenv()
 
 # Check OpenAI version is correct
 required_version = version.parse("1.1.1")
@@ -18,6 +24,7 @@ else:
 
 # Start Flask app
 app = Flask(__name__)
+swagger = Swagger(app)
 
 # Init client
 client = OpenAI(
@@ -30,6 +37,15 @@ assistant_id = "asst_O3il8ToNqoxA0lMDY9NGJPAf"
 # Start conversation thread
 @app.route('/start', methods=['GET'])
 def start_conversation():
+  """
+    Start a new conversation thread.
+    ---
+    tags:
+      - Start
+    responses:
+      200:
+        description: Thread ID
+  """
   print("Starting a new conversation...")  # Debugging line
   thread = client.beta.threads.create()
   print(f"New thread created with ID: {thread.id}")  # Debugging line
@@ -38,6 +54,30 @@ def start_conversation():
 # Generate response
 @app.route('/chat', methods=['POST'])
 def chat():
+  """
+    Chat with the assistant.
+    ---
+    tags:
+      - Conversations
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: UserInput
+          required:
+            - thread_id
+            - message
+          properties:
+            thread_id:
+              type: string
+              description: The ID of the thread.
+            message:
+              type: string
+              description: The user's message.
+    responses:
+      200:
+        description: The assistant's response.
+    """
   data = request.json
   thread_id = data.get('thread_id')
   user_input = data.get('message', '')
