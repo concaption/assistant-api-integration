@@ -2,6 +2,8 @@
 
 # OpenAI Assistant Integration
 
+TODO: TO migrate it into FastAPI.
+
 This Flask application integrates with OpenAI's API to create and manage conversation threads, allowing users to interact with an AI assistant.
 
 ## Getting Started
